@@ -6,9 +6,10 @@ const Traveller = {
     const { dni, name, signup, office, trip } = traveller;
 
     try {
-      const [result] = await db.query(sql, [dni, name, signup, office, trip]);
-      const insertId = result.insertId || result.lastID || null;
-      if (!insertId) {
+        const [result] = await db.query(sql, [dni, name, signup, office, trip]);
+
+        const insertId = result.id;
+        if (result.affectedRows === 0) {
         throw new Error('No se pudo insertar el viajero, ninguna fila afectada.');
       }
 
@@ -17,7 +18,6 @@ const Traveller = {
         id: insertId,
       };
     } catch (error) {
-      console.error('Error al crear traveller:', error);
       throw error;
     }
   },

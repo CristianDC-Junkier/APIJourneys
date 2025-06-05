@@ -1,0 +1,73 @@
+### Intento de conexion
+GET http://localhost:3000/status/login
+
+### Obtener todos los usuarios
+GET http://localhost:3000/usuarios
+
+### Obtener un usuario por ID
+GET http://localhost:3000/usuarios/1
+
+### Crear un nuevo usuario
+POST http://localhost:3000/usuarios
+Content-Type: application/json
+
+{
+    "administrador": 1,
+    "nombre": "InformaticaAlcaldia22",
+    "contraseña": "CRDECR01"
+}
+
+### Actualizar usuario (ID 1)
+PUT http://localhost:3000/usuarios/38
+Content-Type: application/json
+
+{
+    "administrador": 0,
+    "nombre": "Juan López 2",
+    "contraseña": "aaaaa"
+}
+
+### Eliminar usuario (ID 1)
+DELETE http://localhost:3000/usuarios/36
+
+
+
+
+// DOCUMENTOS
+
+### Intento de conexión
+GET http://localhost:3000/status
+
+### Obtener todos los documentos (solo metadatos, sin archivos binarios)
+GET http://localhost:3000/documentos
+
+### Obtener un documento por ID (incluye contenido en Base64)
+GET http://localhost:3000/documentos/1
+
+### Subir un nuevo documento
+POST http://localhost:3000/documentos
+Content-Type: multipart/form-data
+
+{  
+    "archivo": "C:/Users/Cristian/Desktop/B1.PDF",
+    "tipo": "PDF",
+    "nombre": "Contrato Empresa",  
+    "dni": "12345678X",  
+    "direccion": "Madrid",  
+    "fecha": "2025-03-23"  
+}
+
+### Actualizar un documento (con nuevo archivo opcional)
+PUT http://localhost:3000/documentos/1
+Content-Type: multipart/form-data
+
+{  
+    "archivo": [Seleccionar nuevo archivo],  
+    "nombre": "Nuevo Contrato",  
+    "dni": "87654321Z",  
+    "direccion": "Barcelona",  
+    "fecha": "2025-04-10"  
+}
+
+### Eliminar un documento
+DELETE http://localhost:3000/documentos/1

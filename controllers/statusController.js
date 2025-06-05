@@ -1,0 +1,28 @@
+const jwt = require('jsonwebtoken');
+const Admin = require('../models/adminModel'); // tu modelo admin
+const secretKey = process.env.SECRET_KEY;  
+
+exports.login = async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Faltan datos de autenticación' });
+  }
+  try {
+    const admin = await Admin.findByCredentials(username, password);
+    if (!admin) {
+      return res.status(401).json({ error: 'Credenciales inválidas' });
+    }
+
+    // Crear JWT firmado con expiración de 1 hora
+    const securetoken = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
+
+    return res.json({ token: securetoken });
+  } catch (error) {
+    console.error('Error en login:', error);
+    return res.status(500).json({ error: 'Error en servidor' });
+  }
+};
+
+
+

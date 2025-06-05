@@ -17,7 +17,7 @@ exports.login = async (req, res) => {
     // Crear JWT firmado con expiración de 1 hora
     const securetoken = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
 
-    return res.json({ token: securetoken });
+      return res.json({ token: securetoken, id: admin.id });
   } catch (error) {
     console.error('Error en login:', error);
     return res.status(500).json({ error: 'Error en servidor' });

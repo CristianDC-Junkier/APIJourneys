@@ -1,57 +1,90 @@
 const Admin = require('../models/adminModel');
 
 function getSafeError(error) {
-  return {
-    message: error.message || 'Unknown error',
-    code: error.code || null,
-  };
+    const errorMap = {
+        ER_DUP_ENTRY: {
+            message: 'El Admin ya existe.',
+            status: 400,
+        },
+        ADMIN_NOT_FOUND: {
+            message: 'Admin no encontrado.',
+            status: 404,
+        },
+    };
+
+    const code = error.code || null;
+    const mapped = code && errorMap[code];
+
+    return {
+        message: mapped?.message || error.message || 'Error desconocido',
+        code,
+        status: mapped?.status || 500,
+    };
 }
 
 exports.create = async (req, res) => {
-  try {
-    const adminData = req.body;
-    const newAdmin = await Admin.create(adminData);
-    res.json(newAdmin);
-  } catch (error) {
-    res.status(500).json({ error: getSafeError(error) });
-  }
+    try {
+        const adminData = req.body;
+        const newAdmin = await Admin.create(adminData);
+        res.json(newAdmin);
+    } catch (error) {
+        const safeError = getSafeError(error);
+        res.status(safeError.status).json({ error: safeError.message });
+    }
 };
 
 exports.modify = async (req, res) => {
-  try {
-    const adminData = { ...req.body, id: req.params.id };
-    const updatedAdmin = await Admin.modify(adminData);
-    res.json(updatedAdmin);
-  } catch (error) {
-    res.status(500).json({ error: getSafeError(error) });
-  }
+    try {
+        const adminData = { ...req.body, id: req.params.id };
+        const updatedAdmin = await Admin.modify(adminData);
+
+        if (!updatedAdmin) {
+            throw { code: 'ADMIN_NOT_FOUND' };
+        }
+
+        res.json(updatedAdmin);
+    } catch (error) {
+        const safeError = getSafeError(error);
+        res.status(safeError.status).json({ error: safeError.message });
+    }
 };
 
 exports.delete = async (req, res) => {
-  try {
-    const deleted = await Admin.delete(req.params.id);
-    if (!deleted) return res.status(404).json({ error: 'Admin not found' });
-    res.json({ message: 'Deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: getSafeError(error) });
-  }
+    try {
+        const deleted = await Admin.delete(req.params.id);
+
+        if (!deleted) {
+            throw { code: 'ADMIN_NOT_FOUND' };
+        }
+
+        res.json({ message: 'Eliminado correctamente' });
+    } catch (error) {
+        const safeError = getSafeError(error);
+        res.status(safeError.status).json({ error: safeError.message });
+    }
 };
 
 exports.findAll = async (req, res) => {
-  try {
-    const admins = await Admin.findAll();
-    res.json(admins);
-  } catch (error) {
-    res.status(500).json({ error: getSafeError(error) });
-  }
+    try {
+        const admins = await Admin.findAll();
+        res.json(admins);
+    } catch (error) {
+        const safeError = getSafeError(error);
+        res.status(safeError.status).json({ error: safeError.message });
+    }
 };
 
 exports.findById = async (req, res) => {
-  try {
-    const admin = await Admin.findById(req.params.id);
-    if (!admin) return res.status(404).json({ error: 'Admin not found' });
-    res.json(admin);
-  } catch (error) {
-    res.status(500).json({ error: getSafeError(error) });
-  }
+    try {
+        const admin = await Admin.findById(req.params.id);
+
+        if (!admin) {
+            throw { code: 'ADMIN_NOT_FOUND' };
+        }
+
+        res.json(admin);
+    } catch (error) {
+        const safeError = getSafeError(error);
+        res.status(safeError.status).json({ error: safeError.message });
+    }
 };

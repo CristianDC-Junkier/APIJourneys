@@ -1,80 +1,87 @@
 const db = require('../config/db');
 
 const Traveller = {
-  create: async (traveller) => {
-    const sql = `INSERT INTO traveller (dni, name, singup, office, trip) VALUES (?, ?, ?, ?, ?)`;
-    const { dni, name, signup, office, trip } = traveller;
+    create: async (traveller) => {
+        const sql = `INSERT INTO traveller (dni, name, signup, office, trip) VALUES (?, ?, ?, ?, ?)`;
+        const { dni, name, signup, office, trip } = traveller;
 
-    try {
-        const [result] = await db.query(sql, [dni, name, signup, office, trip]);
+        try {
+            const [result] = await db.query(sql, [dni, name, signup, office, trip]);
 
-        const insertId = result.id;
-        if (result.affectedRows === 0) {
-        throw new Error('No se pudo insertar el viajero, ninguna fila afectada.');
-      }
+            if (result.affectedRows === 0) {
+                throw new Error('No se pudo insertar el viajero, ninguna fila afectada.');
+            }
 
-      return {
-        ...traveller,
-        id: insertId,
-      };
-    } catch (error) {
-      throw error;
-    }
-  },
+            return {
+                ...traveller,
+                id: result.insertId,
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 
-  modify: async (traveller) => {
-    const sql = `UPDATE traveller SET dni = ?, name = ?, singup = ?, office = ?, trip = ? WHERE id = ?`;
-    const { id, dni, name, signup, office, trip } = traveller;
+    modify: async (traveller) => {
+        const sql = `UPDATE traveller SET dni = ?, name = ?, signup = ?, office = ?, trip = ? WHERE id = ?`;
+        const { id, dni, name, signup, office, trip } = traveller;
 
-    try {
-      const [result] = await db.query(sql, [dni, name, signup, office, trip, id]);
-      if (result.affectedRows === 0 && result.changes === 0) {
-        throw new Error('No se pudo actualizar el viajero, ninguna fila afectada.');
-      }
+        try {
+            const [result] = await db.query(sql, [dni, name, signup, office, trip, id]);
 
-      return { ...traveller };
-    } catch (error) {
-      console.error('Error al modificar traveller:', error);
-      throw error;
-    }
-  },
+            if (result.affectedRows === 0) {
+                // No filas afectadas indica que el traveller no existe
+                throw { code: 'TRAVELLER_NOT_FOUND' };
+            }
 
-  delete: async (id) => {
-    const sql = `DELETE FROM traveller WHERE id = ?`;
+            return { ...traveller };
+        } catch (error) {
+            throw error;
+        }
+    },
 
-    try {
-      const [result] = await db.query(sql, [id]);
-      const success = result.affectedRows > 0 || result.changes > 0;
-      return success;
-    } catch (error) {
-      console.error(`Error al eliminar traveller con id ${id}:`, error);
-      throw error;
-    }
-  },
+    delete: async (id) => {
+        const sql = `DELETE FROM traveller WHERE id = ?`;
 
-  findAll: async () => {
-    const sql = `SELECT * FROM traveller`;
+        try {
+            const [result] = await db.query(sql, [id]);
 
-    try {
-      const [rows] = await db.query(sql);
-      return rows;
-    } catch (error) {
-      console.error('Error al obtener todos los travellers:', error);
-      throw error;
-    }
-  },
+            if (result.affectedRows === 0) {
+                // No filas afectadas => traveller no encontrado
+                throw { code: 'TRAVELLER_NOT_FOUND' };
+            }
 
-  findById: async (id) => {
-    const sql = `SELECT * FROM traveller WHERE id = ?`;
+            return true;
+        } catch (error) {
+            throw error;
+        }
+    },
 
-    try {
-      const [rows] = await db.query(sql, [id]);
-      return rows[0] || null;
-    } catch (error) {
-      console.error(`Error al obtener traveller por id ${id}:`, error);
-      throw error;
-    }
-  }
+    findAll: async () => {
+        const sql = `SELECT * FROM traveller`;
+
+        try {
+            const [rows] = await db.query(sql);
+            return rows;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    findById: async (id) => {
+        const sql = `SELECT * FROM traveller WHERE id = ?`;
+
+        try {
+            const [rows] = await db.query(sql, [id]);
+
+            if (rows.length === 0) {
+                throw { code: 'TRAVELLER_NOT_FOUND' };
+            }
+
+            return rows[0];
+        } catch (error) {
+            throw error;
+        }
+    },
 };
 
 module.exports = Traveller;

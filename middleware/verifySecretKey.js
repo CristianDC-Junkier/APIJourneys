@@ -1,24 +1,27 @@
 const jwt = require('jsonwebtoken');
+const path = require('path');
 const secretKey = process.env.SECRET_KEY;
+const { respondWithError, respondNotFound } = require('../controllers/errorsController');
 
 function verifySecretKey(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Esperamos: 'Bearer <token>'
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
 
-  if (!token) {
-    return res.status(401).json({ error: 'Token requerido' });
-  }
-
-  jwt.verify(token, secretKey, (err, user) => {
-    if (err) {
-      if (err.name === 'TokenExpiredError') {
-        return res.status(401).json({ error: 'Token expirado, por favor haz login de nuevo' });
-      }
-      return res.status(403).json({ error: 'Token inválido' });
+    if (!token) {
+        return respondWithError(req, res, 401, 'Token requerido');
     }
-    req.user = user; // Payload disponible para rutas protegidas
-    next();
-  });
+
+    jwt.verify(token, secretKey, (err, user) => {
+        if (err) {
+            if (err.name === 'TokenExpiredError') {
+                return respondWithError(req, res, 401, 'Token expirado');
+            }
+            return respondWithError(req, res, 403, 'Token inválido');
+        }
+
+        req.user = user;
+        next();
+    });
 }
 
 module.exports = verifySecretKey;

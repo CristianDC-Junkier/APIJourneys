@@ -14,7 +14,7 @@ const Traveller = {
 
             return {
                 ...traveller,
-                id: result.insertId,
+                id: result.insertId || result.lastID || result.id,
             };
         } catch (error) {
             throw error;
@@ -29,7 +29,6 @@ const Traveller = {
             const [result] = await db.query(sql, [dni, name, signup, office, trip, id]);
 
             if (result.affectedRows === 0) {
-                // No filas afectadas indica que el traveller no existe
                 throw { code: 'TRAVELLER_NOT_FOUND' };
             }
 
@@ -46,7 +45,6 @@ const Traveller = {
             const [result] = await db.query(sql, [id]);
 
             if (result.affectedRows === 0) {
-                // No filas afectadas => traveller no encontrado
                 throw { code: 'TRAVELLER_NOT_FOUND' };
             }
 
@@ -57,7 +55,7 @@ const Traveller = {
     },
 
     findAll: async () => {
-        const sql = `SELECT * FROM traveller`;
+        const sql = `SELECT * FROM traveller ORDER BY id`;
 
         try {
             const [rows] = await db.query(sql);

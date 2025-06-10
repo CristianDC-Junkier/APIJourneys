@@ -15,8 +15,9 @@ const Admin = {
                 throw new Error('No se pudo insertar el administrador, ninguna fila afectada.');
             }
 
+
             return {
-                id: result.insertId,
+                id: result.insertId || result.lastID || result.id,
                 username,
             };
         } catch (error) {
@@ -55,7 +56,7 @@ const Admin = {
     },
 
     findAll: async () => {
-        const sql = `SELECT id, username FROM admin`;
+        const sql = `SELECT id, username FROM admin ORDER BY id`;
         try {
             const [rows] = await db.query(sql);
             return rows;

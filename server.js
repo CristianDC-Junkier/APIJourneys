@@ -10,7 +10,9 @@ app.use(cors());
 app.use(express.json());
 
 // Servir archivos estáticos (como imágenes)
-app.use(express.static(path.join(__dirname, 'public')));
+const basePath = process.pkg ? path.dirname(process.execPath) : __dirname;
+app.use(express.static(path.join(basePath, 'public')));
+
 
 // Rutas
 const statusRoutes = require('./routes/statusRoutes');
@@ -28,5 +30,5 @@ app.use(notFoundHandler);
 // Arrancar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });

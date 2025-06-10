@@ -1,7 +1,0 @@
-EN EL POWERSHELL
-cd C:\Users\Cristian\Desktop\Almonte\Obras_Tamaño\API_REST 
-npx pkg server.js --output miApp --targets node18-win-x64
-
-
-
-

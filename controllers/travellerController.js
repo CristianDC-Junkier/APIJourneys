@@ -16,7 +16,7 @@ function getSafeError(error) {
     const mapped = code && errorMap[code];
 
     return {
-        error: mapped?.message || error.message || 'Error desconocido',
+        message: mapped?.message || error.message || 'Error desconocido',
         code,
         status: mapped?.status || 500,
     };

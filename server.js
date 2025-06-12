@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const db = require('./config/db');
 
 const app = express();
 
@@ -10,8 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 // Servir archivos estáticos (como imágenes)
-const basePath = process.pkg ? path.dirname(process.execPath) : __dirname;
-app.use(express.static(path.join(basePath, 'public')));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 
 // Rutas
@@ -28,7 +28,18 @@ const notFoundHandler = require('./middleware/notFoundHandler');
 app.use(notFoundHandler);
 
 // Arrancar servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+async function start() {
+    try {
+        await db.init();
+        console.log('Base de datos inicializada correctamente.');
+        const PORT = process.env.PORT || 0;
+        app.listen(PORT, () => {
+            console.log(`Servidor corriendo en http://localhost:${PORT}`);
+        });
+    } catch (err) {
+        console.error('Error inicializando la base de datos:', err.message);
+        process.exit(1);
+    }
+}
+
+start();

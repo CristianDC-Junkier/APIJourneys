@@ -1,13 +1,13 @@
-﻿const Traveller = require('../models/travellerModel');
+﻿const Travel = require('../models/travelModel');
 
 function getSafeError(error) {
     const errorMap = {
         ER_DUP_ENTRY: {
-            message: 'El Viajero ya existe.',
+            message: 'El viaje ya existe.',
             status: 400,
         },
-        TRAVELLER_NOT_FOUND: {
-            message: 'Viajero no encontrado.',
+        TRAVEL_NOT_FOUND: {
+            message: 'Viaje no encontrado.',
             status: 404,
         },
     };
@@ -24,9 +24,9 @@ function getSafeError(error) {
 
 exports.create = async (req, res) => {
     try {
-        const travellerData = req.body;
-        const newTraveller = await Traveller.create(travellerData);
-        res.json(newTraveller);
+        const travelData = req.body;
+        const newTravel = await Travel.create(travelData);
+        res.json(newTravel);
     } catch (error) {
         const safeError = getSafeError(error);
         res.status(safeError.status).json({ error: safeError.message });
@@ -35,14 +35,14 @@ exports.create = async (req, res) => {
 
 exports.modify = async (req, res) => {
     try {
-        const travellerData = { ...req.body, id: req.params.id };
-        const updatedTraveller = await Traveller.modify(travellerData);
+        const travelData = { ...req.body, id: req.params.id };
+        const updatedTravel = await Travel.modify(travelData);
 
-        if (!updatedTraveller) {
-            throw { code: 'TRAVELLER_NOT_FOUND' };
+        if (!updatedTravel) {
+            throw { code: 'TRAVEL_NOT_FOUND' };
         }
 
-        res.json(updatedTraveller);
+        res.json(updatedTravel);
     } catch (error) {
         const safeError = getSafeError(error);
         res.status(safeError.status).json({ error: safeError.message });
@@ -51,10 +51,10 @@ exports.modify = async (req, res) => {
 
 exports.delete = async (req, res) => {
     try {
-        const deleted = await Traveller.delete(req.params.id);
+        const deleted = await Travel.delete(req.params.id);
 
         if (!deleted) {
-            throw { code: 'TRAVELLER_NOT_FOUND' };
+            throw { code: 'TRAVEL_NOT_FOUND' };
         }
 
         res.json({ message: 'Eliminado correctamente' });
@@ -66,8 +66,8 @@ exports.delete = async (req, res) => {
 
 exports.findAll = async (req, res) => {
     try {
-        const travellers = await Traveller.findAll();
-        res.json(travellers);
+        const travels = await Travel.findAll();
+        res.json(travels);
     } catch (error) {
         const safeError = getSafeError(error);
         res.status(safeError.status).json({ error: safeError.message });
@@ -76,25 +76,28 @@ exports.findAll = async (req, res) => {
 
 exports.findByDepartment = async (req, res) => {
     try {
-        const travellers = await Traveller.findByDepartment(req.params.department);
+        const travels = await Travel.findByDepartment(req.params.department);
 
-        res.json(travellers);
+        if (!travels || travels.length === 0) {
+            throw { code: 'TRAVEL_NOT_FOUND' };
+        }
+
+        res.json(travels);
     } catch (error) {
         const safeError = getSafeError(error);
         res.status(safeError.status).json({ error: safeError.message });
     }
 };
 
-
 exports.findById = async (req, res) => {
     try {
-        const traveller = await Traveller.findById(req.params.id);
+        const travel = await Travel.findById(req.params.id);
 
-        if (!traveller) {
-            throw { code: 'TRAVELLER_NOT_FOUND' };
+        if (!travel) {
+            throw { code: 'TRAVEL_NOT_FOUND' };
         }
 
-        res.json(traveller);
+        res.json(travel);
     } catch (error) {
         const safeError = getSafeError(error);
         res.status(safeError.status).json({ error: safeError.message });

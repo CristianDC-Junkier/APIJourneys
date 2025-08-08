@@ -1,12 +1,12 @@
-const db = require('../config/db');
+﻿const db = require('../config/db');
 
 const Traveller = {
     create: async (traveller) => {
-        const sql = `INSERT INTO traveller (dni, name, signup, office, trip) VALUES (?, ?, ?, ?, ?)`;
-        const { dni, name, signup, office, trip } = traveller;
+        const sql = `INSERT INTO traveller (dni, name, signup, department, trip) VALUES (?, ?, ?, ?, ?, ?)`;
+        const { dni, name, signup, office, trip, department } = traveller;
 
         try {
-            const [result] = await db.query(sql, [dni, name, signup, office, trip]);
+            const [result] = await db.query(sql, [dni, name, signup, department, trip ]);
 
             if (result.affectedRows === 0) {
                 throw new Error('No se pudo insertar el viajero, ninguna fila afectada.');
@@ -22,11 +22,11 @@ const Traveller = {
     },
 
     modify: async (traveller) => {
-        const sql = `UPDATE traveller SET dni = ?, name = ?, signup = ?, office = ?, trip = ? WHERE id = ?`;
-        const { id, dni, name, signup, office, trip } = traveller;
+        const sql = `UPDATE traveller SET dni = ?, name = ?, signup = ?,  department = ?, trip = ?,  WHERE id = ?`;
+        const { id, dni, name, signup, department, trip } = traveller;
 
         try {
-            const [result] = await db.query(sql, [dni, name, signup, office, trip, id]);
+            const [result] = await db.query(sql, [dni, name, signup, department, trip, id]);
 
             if (result.affectedRows === 0) {
                 throw { code: 'TRAVELLER_NOT_FOUND' };
@@ -55,10 +55,21 @@ const Traveller = {
     },
 
     findAll: async () => {
-        const sql = `SELECT * FROM traveller ORDER BY id`;
+        const sql = `SELECT * FROM traveller ORDER BY dni`;
 
         try {
             const [rows] = await db.query(sql);
+            return rows;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    findByDepartment: async (department) => {
+        const sql = `SELECT * FROM traveller WHERE department = ? ORDER BY dni`;
+
+        try {
+            const [rows] = await db.query(sql, [department]);
             return rows;
         } catch (error) {
             throw error;

@@ -1,42 +1,42 @@
-const db = require('../config/db');
+﻿const db = require('../config/db');
 const bcrypt = require('bcryptjs');
 
 const SALT_ROUNDS = 10;
 
 const Admin = {
     create: async (admin) => {
-        const sql = `INSERT INTO admin (username, password) VALUES (?, ?)`;
-        const { username, password } = admin;
+        const sql = `INSERT INTO admin (username, password, department) VALUES (?, ?, ?)`;
+        const { username, password, department } = admin;
         try {
             const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-            const [result] = await db.query(sql, [username, hashedPassword]);
+            const [result] = await db.query(sql, [username, hashedPassword, department]);
 
             if (result.affectedRows === 0) {
                 throw new Error('No se pudo insertar el administrador, ninguna fila afectada.');
             }
 
-
             return {
                 id: result.insertId || result.lastID || result.id,
                 username,
+                department,
             };
         } catch (error) {
-            throw error; 
+            throw error;
         }
     },
 
     modify: async (admin) => {
-        const sql = `UPDATE admin SET username = ?, password = ? WHERE id = ?`;
-        const { id, username, password } = admin;
+        const sql = `UPDATE admin SET username = ?, password = ?, department = ? WHERE id = ?`;
+        const { id, username, password, department } = admin;
         try {
             const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-            const [result] = await db.query(sql, [username, hashedPassword, id]);
+            const [result] = await db.query(sql, [username, hashedPassword, department, id]);
 
             if (result.affectedRows === 0) {
                 throw { code: 'ADMIN_NOT_FOUND' };
             }
 
-            return { id, username };
+            return { id, username, department };
         } catch (error) {
             throw error;
         }
@@ -56,7 +56,7 @@ const Admin = {
     },
 
     findAll: async () => {
-        const sql = `SELECT id, username FROM admin ORDER BY id`;
+        const sql = `SELECT id, username, department FROM admin ORDER BY id`;
         try {
             const [rows] = await db.query(sql);
             return rows;
@@ -66,7 +66,7 @@ const Admin = {
     },
 
     findById: async (id) => {
-        const sql = `SELECT id, username FROM admin WHERE id = ?`;
+        const sql = `SELECT id, username, department FROM admin WHERE id = ?`;
         try {
             const [rows] = await db.query(sql, [id]);
             if (rows.length === 0) {
@@ -91,6 +91,7 @@ const Admin = {
             return {
                 id: admin.id,
                 username: admin.username,
+                department: admin.department,
             };
         } catch (error) {
             throw error;

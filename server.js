@@ -1,4 +1,4 @@
-require('dotenv').config();
+﻿require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -18,10 +18,14 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 const statusRoutes = require('./routes/statusRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const travellerRoutes = require('./routes/travellerRoutes');
+const travelRoutes = require('./routes/travelRoutes');
+const departmentRoutes = require('./routes/departmentRoutes');
 
 app.use('/status', statusRoutes);
 app.use('/admins', adminRoutes);
 app.use('/travellers', travellerRoutes);
+app.use('/travels', travelRoutes);
+app.use('/departments', departmentRoutes);
 
 // Middleware 404 personalizado
 const notFoundHandler = require('./middleware/notFoundHandler');

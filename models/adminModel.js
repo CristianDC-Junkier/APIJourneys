@@ -80,7 +80,9 @@ const Admin = {
 
     findByCredentials: async (username, plainPassword) => {
         const sql =
-           `SELECT * FROM admin`;
+           `SELECT * FROM admin a 
+            WHERE a.username = ?
+            `;
         try {
             const [rows] = await db.query(sql, [username]);
             if (rows.length === 0) return null;
@@ -91,7 +93,8 @@ const Admin = {
 
             return {
                 id: admin.id,
-                department: admin.department
+                department: admin.department,
+                    
             };
         } catch (error) {
             throw error;

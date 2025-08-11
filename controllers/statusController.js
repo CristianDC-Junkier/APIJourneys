@@ -1,5 +1,5 @@
 ﻿const jwt = require('jsonwebtoken');
-const Admin = require('../models/adminModel'); // tu modelo admin
+const Admin = require('../models/adminModel'); 
 const secretKey = process.env.SECRET_KEY;  
 
 exports.login = async (req, res) => {
@@ -20,7 +20,7 @@ exports.login = async (req, res) => {
       return res.json({
           token: securetoken,
           id: admin.id,
-          department: admin.department_id
+          department: admin.department
       });
   } catch (error) {
     return res.status(500).json({ error: 'Error en servidor' });

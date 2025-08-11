@@ -56,7 +56,7 @@ const Admin = {
     },
 
     findAll: async () => {
-        const sql = `SELECT id, username, department FROM admin ORDER BY id`;
+        const sql = `SELECT * FROM admin ORDER BY id`;
         try {
             const [rows] = await db.query(sql);
             return rows;
@@ -79,7 +79,8 @@ const Admin = {
     },
 
     findByCredentials: async (username, plainPassword) => {
-        const sql = `SELECT * FROM admin WHERE username = ?`;
+        const sql =
+           `SELECT * FROM admin`;
         try {
             const [rows] = await db.query(sql, [username]);
             if (rows.length === 0) return null;
@@ -90,8 +91,7 @@ const Admin = {
 
             return {
                 id: admin.id,
-                username: admin.username,
-                department: admin.department,
+                department: admin.department
             };
         } catch (error) {
             throw error;

@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+﻿const jwt = require('jsonwebtoken');
 const Admin = require('../models/adminModel'); // tu modelo admin
 const secretKey = process.env.SECRET_KEY;  
 
@@ -14,12 +14,15 @@ exports.login = async (req, res) => {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    // Crear JWT firmado con expiración de 1 hora
+    // Crear JWT firmado con expiración de 30m
     const securetoken = jwt.sign({ username }, secretKey, { expiresIn: '30m' });
 
-      return res.json({ token: securetoken, id: admin.id });
+      return res.json({
+          token: securetoken,
+          id: admin.id,
+          department: admin.department_id
+      });
   } catch (error) {
-    console.error('Error en login:', error);
     return res.status(500).json({ error: 'Error en servidor' });
   }
 };

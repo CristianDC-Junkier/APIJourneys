@@ -7,8 +7,12 @@ function getSafeError(error) {
             status: 400,
         },
         TRAVELLER_NOT_FOUND: {
-            message: 'Viajero no encontrado.',
+            message: 'Viajero/s no encontrado.',
             status: 404,
+        },
+        EMPTY_TABLE: {
+            message: 'Lista de viajeros vacia.',
+            status: 204,
         },
     };
 
@@ -67,6 +71,9 @@ exports.delete = async (req, res) => {
 exports.findAll = async (req, res) => {
     try {
         const travellers = await Traveller.findAll();
+        if (!travellers || travellers.length === 0) {
+            throw { code: 'EMPTY_TABLE' };
+        }
         res.json(travellers);
     } catch (error) {
         const safeError = getSafeError(error);
@@ -77,7 +84,9 @@ exports.findAll = async (req, res) => {
 exports.findByDepartment = async (req, res) => {
     try {
         const travellers = await Traveller.findByDepartment(req.params.department);
-
+        if (!travellers || travellers.length === 0) {
+            throw { code: 'EMPTY_TABLE' };
+        }
         res.json(travellers);
     } catch (error) {
         const safeError = getSafeError(error);

@@ -56,7 +56,6 @@ const Travel = {
 
     findAll: async () => {
         const sql = `SELECT * FROM travel ORDER BY id`;
-
         try {
             const [rows] = await db.query(sql);
             return rows;

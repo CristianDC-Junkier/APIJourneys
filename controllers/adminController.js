@@ -1,4 +1,4 @@
-const Admin = require('../models/adminModel');
+﻿const Admin = require('../models/adminModel');
 
 function getSafeError(error) {
     const errorMap = {
@@ -9,6 +9,10 @@ function getSafeError(error) {
         ADMIN_NOT_FOUND: {
             message: 'Admin no encontrado.',
             status: 404,
+        },
+        EMPTY_TABLE: {
+            message: 'Lista de admins vacia.',
+            status: 204,
         },
     };
 
@@ -67,6 +71,9 @@ exports.delete = async (req, res) => {
 exports.findAll = async (req, res) => {
     try {
         const admins = await Admin.findAll();
+        if (!admins || admins.length === 0) {
+            throw { code: 'EMPTY_TABLE' };
+        }
         res.json(admins);
     } catch (error) {
         const safeError = getSafeError(error);

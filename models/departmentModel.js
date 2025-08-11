@@ -3,7 +3,7 @@
 const Department = {
     findAll: async () => {
         const sql = `SELECT * FROM department ORDER BY id`;
-
+        console.log("Executing SQL:", sql); 
         try {
             const [rows] = await db.query(sql);
             return rows;

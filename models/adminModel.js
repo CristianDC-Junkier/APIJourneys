@@ -80,7 +80,7 @@ const Admin = {
 
     findByCredentials: async (username, plainPassword) => {
         const sql =
-           `SELECT * FROM admin`;
+           `SELECT * FROM admin WHERE username = ?`;
         try {
             const [rows] = await db.query(sql, [username]);
             if (rows.length === 0) return null;

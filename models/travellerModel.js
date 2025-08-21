@@ -2,8 +2,8 @@
 
 const Traveller = {
     create: async (traveller) => {
-        const sql = `INSERT INTO traveller (dni, name, signup, department, trip) VALUES (?, ?, ?, ?, ?, ?)`;
-        const { dni, name, signup, office, trip, department } = traveller;
+        const sql = `INSERT INTO traveller (dni, name, signup, department, trip) VALUES (?, ?, ?, ?, ?)`;
+        const { dni, name, signup, department, trip } = traveller;
 
         try {
             const [result] = await db.query(sql, [dni, name, signup, department, trip ]);

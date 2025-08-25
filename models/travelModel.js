@@ -3,10 +3,10 @@
 const Travel = {
     create: async (travel) => {
         const sql = `INSERT INTO travel (descriptor, seats_occupied, seats_total, department, bus) VALUES (?, ?, ?, ?, ?)`;
-        const { name, seats_occupied, seats_total, department, bus } = travel;
+        const { descriptor, seats_occupied, seats_total, department, bus } = travel;
 
         try {
-            const [result] = await db.query(sql, [name, seats_occupied, seats_total, department, bus]);
+            const [result] = await db.query(sql, [descriptor, seats_occupied, seats_total, department, bus]);
 
             if (result.affectedRows === 0) {
                 throw new Error('No se pudo insertar el viaje, ninguna fila afectada.');
@@ -23,10 +23,10 @@ const Travel = {
 
     modify: async (travel) => {
         const sql = `UPDATE travel SET descriptor = ?, seats_occupied = ?, seats_total = ?, department = ?, bus = ? WHERE id = ?`;
-        const { id, name, seats_occupied, seats_total, department, bus } = travel;
+        const { id, descriptor, seats_occupied, seats_total, department, bus } = travel;
 
         try {
-            const [result] = await db.query(sql, [name, seats_occupied, seats_total, department, bus, id]);
+            const [result] = await db.query(sql, [descriptor, seats_occupied, seats_total, department, bus, id]);
 
             if (result.affectedRows === 0) {
                 throw { code: 'TRAVEL_NOT_FOUND' };

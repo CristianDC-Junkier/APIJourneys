@@ -79,10 +79,13 @@ const Admin = {
     },
 
     findByCredentials: async (username, plainPassword) => {
-        const sql =
-           `SELECT * FROM admin a 
+        const sql = `
+            SELECT a.id as adminId, a.username, a.password,
+                d.id as departmentId, d.name as departmentName
+            FROM admin a
+            INNER JOIN department d ON a.department = d.id
             WHERE a.username = ?
-            `;
+        `;
         try {
             const [rows] = await db.query(sql, [username]);
             if (rows.length === 0) return null;
@@ -92,9 +95,9 @@ const Admin = {
             if (!isMatch) return null;
 
             return {
-                id: admin.id,
-                department: admin.department,
-                    
+                id: admin.adminId,
+                departmentId: admin.departmentId,
+                departmentName: admin.departmentName,
             };
         } catch (error) {
             throw error;

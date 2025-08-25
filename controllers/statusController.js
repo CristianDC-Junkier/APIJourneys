@@ -20,7 +20,8 @@ exports.login = async (req, res) => {
       return res.json({
           token: securetoken,
           id: admin.id,
-          department: admin.department
+          departmentId: admin.departmentId,
+          departmentName: admin.departmentName,
       });
   } catch (error) {
     return res.status(500).json({ error: 'Error en servidor' });

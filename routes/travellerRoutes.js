@@ -8,7 +8,7 @@ router.use(verifySecretKey);
 // Obtener todos los viajeros
 router.get('/', travellerController.findAll);
 // Obtener todos los viajeros por departamento
-router.get('/department/:id', travellerController.findAll);
+router.get('/department/:id', travellerController.findByDepartment);
 // Obtener un viajero por ID
 router.get('/:id', travellerController.findById);
 // Crear un nuevo viajero

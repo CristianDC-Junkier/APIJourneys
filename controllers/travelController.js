@@ -83,7 +83,7 @@ exports.findAll = async (req, res) => {
 
 exports.findByDepartment = async (req, res) => {
     try {
-        const travels = await Travel.findByDepartment(req.params.department);
+        const travels = await Travel.findByDepartment(req.params.id);
         if (!travels || travels.length === 0) {
             throw { code: 'EMPTY_TABLE' };
         }

@@ -10,6 +10,10 @@ function getSafeError(error) {
             message: 'Viajero/s no encontrado.',
             status: 404,
         },
+        TRAVELLER_CONFLICT: {
+            message: 'El viajero ya fue modificado.',
+            status: 409,
+        },
         EMPTY_TABLE: {
             message: 'Lista de viajeros vacia.',
             status: 204,

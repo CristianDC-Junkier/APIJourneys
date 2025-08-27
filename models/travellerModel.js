@@ -6,11 +6,7 @@ const Traveller = {
         const { dni, name, signup, department, trip } = traveller;
 
         try {
-            const [result] = await db.query(sql, [dni, name, signup, department, trip ]);
-
-            if (result.affectedRows === 0) {
-                throw new Error('No se pudo insertar el viajero, ninguna fila afectada.');
-            }
+            const [result] = await db.query(sql, [dni, name, signup, department, trip]);
 
             return {
                 ...traveller,
@@ -22,17 +18,24 @@ const Traveller = {
     },
 
     modify: async (traveller) => {
-        const sql = `UPDATE traveller SET dni = ?, name = ?, signup = ?, department = ?, trip = ? WHERE id = ?`;
-        const { id, dni, name, signup, department, trip } = traveller;
+        const sql = `UPDATE traveller SET dni = ?, name = ?, signup = ?, department = ?, trip = ?, version = (version + 1) % 10000 WHERE id = ? AND version = ?`;
+
+        const { id, dni, name, signup, department, trip, version } = traveller;
 
         try {
-            const [result] = await db.query(sql, [dni, name, signup, department, trip, id]);
+            const [result] = await db.query(sql, [dni, name, signup, department, trip, id, version]);
 
             if (result.affectedRows === 0) {
-                throw { code: 'TRAVELLER_NOT_FOUND' };
+                const [rows] = await db.query(`SELECT version FROM traveller WHERE id = ?`, [id]);
+
+                if (rows.length === 0) {
+                    throw { code: 'TRAVELLER_NOT_FOUND'};
+                } else {
+                    throw { code: 'TRAVELLER_CONFLICT'};
+                }
             }
 
-            return { ...traveller };
+            return { ...traveller, version: (version + 1) % 10000 };
         } catch (error) {
             throw error;
         }

@@ -1,17 +1,17 @@
-﻿const Admin = require('../models/adminModel');
+﻿const Admin = require('../models/workerModel');
 
 function getSafeError(error) {
     const errorMap = {
         ER_DUP_ENTRY: {
-            message: 'El Admin ya existe.',
+            message: 'El Trabajador ya existe.',
             status: 400,
         },
-        ADMIN_NOT_FOUND: {
-            message: 'Admin no encontrado.',
+        WORKER_NOT_FOUND: {
+            message: 'Trabajador no encontrado.',
             status: 404,
         },
         EMPTY_TABLE: {
-            message: 'Lista de admins vacia.',
+            message: 'Lista de trabajadores vacia.',
             status: 204,
         },
     };
@@ -43,7 +43,7 @@ exports.modify = async (req, res) => {
         const updatedAdmin = await Admin.modify(adminData);
 
         if (!updatedAdmin) {
-            throw { code: 'ADMIN_NOT_FOUND' };
+            throw { code: 'WORKER_NOT_FOUND' };
         }
 
         res.json(updatedAdmin);
@@ -58,7 +58,7 @@ exports.delete = async (req, res) => {
         const deleted = await Admin.delete(req.params.id);
 
         if (!deleted) {
-            throw { code: 'ADMIN_NOT_FOUND' };
+            throw { code: 'WORKER_NOT_FOUND' };
         }
 
         res.json({ message: 'Eliminado correctamente' });
@@ -86,7 +86,7 @@ exports.findById = async (req, res) => {
         const admin = await Admin.findById(req.params.id);
 
         if (!admin) {
-            throw { code: 'ADMIN_NOT_FOUND' };
+            throw { code: 'WORKER_NOT_FOUND' };
         }
 
         res.json(admin);

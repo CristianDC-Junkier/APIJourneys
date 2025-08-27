@@ -2,7 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const db = require('./config/db');
+const { initDatabase } = require('./config/dbInit'); 
 
 const app = express();
 
@@ -16,13 +16,13 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Rutas
 const statusRoutes = require('./routes/statusRoutes');
-const adminRoutes = require('./routes/adminRoutes');
+const workerRoutes = require('./routes/workerRoutes');
 const travellerRoutes = require('./routes/travellerRoutes');
 const travelRoutes = require('./routes/travelRoutes');
 const departmentRoutes = require('./routes/departmentRoutes');
 
 app.use('/status', statusRoutes);
-app.use('/admins', adminRoutes);
+app.use('/workers', workerRoutes);
 app.use('/travellers', travellerRoutes);
 app.use('/travels', travelRoutes);
 app.use('/departments', departmentRoutes);
@@ -34,7 +34,7 @@ app.use(notFoundHandler);
 // Arrancar servidor
 async function start() {
     try {
-        await db.init();
+        await initDatabase();
         console.log('Base de datos inicializada correctamente.');
         const PORT = process.env.PORT || 0;
         app.listen(PORT, () => {

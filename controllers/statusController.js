@@ -1,5 +1,5 @@
 ﻿const jwt = require('jsonwebtoken');
-const Admin = require('../models/adminModel'); 
+const Worker = require('../models/workerModel'); 
 const secretKey = process.env.SECRET_KEY;  
 
 exports.login = async (req, res) => {
@@ -9,8 +9,8 @@ exports.login = async (req, res) => {
         return res.status(400).json({ error: 'Faltan datos de autenticación' });
     }
     try {
-        const admin = await Admin.findByCredentials(username, password);
-        if (!admin) {
+        const worker = await Worker.findByCredentials(username, password);
+        if (!worker) {
             return res.status(401).json({ error: 'Credenciales inválidas' });
         }
 
@@ -19,9 +19,9 @@ exports.login = async (req, res) => {
 
       return res.json({
           token: securetoken,
-          id: admin.id,
-          departmentId: admin.departmentId,
-          departmentName: admin.departmentName,
+          id: worker.id,
+          departmentId: worker.departmentId,
+          departmentName: worker.departmentName,
       });
   } catch (error) {
     return res.status(500).json({ error: 'Error en servidor' });

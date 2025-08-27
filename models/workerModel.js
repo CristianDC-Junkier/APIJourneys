@@ -5,14 +5,14 @@ const SALT_ROUNDS = 10;
 
 const Admin = {
     create: async (admin) => {
-        const sql = `INSERT INTO admin (username, password, department) VALUES (?, ?, ?)`;
+        const sql = `INSERT INTO worker (username, password, department) VALUES (?, ?, ?)`;
         const { username, password, department } = admin;
         try {
             const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
             const [result] = await db.query(sql, [username, hashedPassword, department]);
 
             if (result.affectedRows === 0) {
-                throw new Error('No se pudo insertar el administrador, ninguna fila afectada.');
+                throw new Error('No se pudo insertar el trabajador, ninguna fila afectada.');
             }
 
             return {
@@ -26,14 +26,14 @@ const Admin = {
     },
 
     modify: async (admin) => {
-        const sql = `UPDATE admin SET username = ?, password = ?, department = ? WHERE id = ?`;
+        const sql = `UPDATE worker SET username = ?, password = ?, department = ? WHERE id = ?`;
         const { id, username, password, department } = admin;
         try {
             const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
             const [result] = await db.query(sql, [username, hashedPassword, department, id]);
 
             if (result.affectedRows === 0) {
-                throw { code: 'ADMIN_NOT_FOUND' };
+                throw { code: 'WORKER_NOT_FOUND' };
             }
 
             return { id, username, department };
@@ -43,11 +43,11 @@ const Admin = {
     },
 
     delete: async (id) => {
-        const sql = `DELETE FROM admin WHERE id = ?`;
+        const sql = `DELETE FROM worker WHERE id = ?`;
         try {
             const [result] = await db.query(sql, [id]);
             if (result.affectedRows === 0) {
-                throw { code: 'ADMIN_NOT_FOUND' };
+                throw { code: 'WORKER_NOT_FOUND' };
             }
             return true;
         } catch (error) {
@@ -56,7 +56,7 @@ const Admin = {
     },
 
     findAll: async () => {
-        const sql = `SELECT * FROM admin ORDER BY id`;
+        const sql = `SELECT * FROM worker ORDER BY id`;
         try {
             const [rows] = await db.query(sql);
             return rows;
@@ -66,11 +66,11 @@ const Admin = {
     },
 
     findById: async (id) => {
-        const sql = `SELECT id, username, department FROM admin WHERE id = ?`;
+        const sql = `SELECT id, username, department FROM worker WHERE id = ?`;
         try {
             const [rows] = await db.query(sql, [id]);
             if (rows.length === 0) {
-                throw { code: 'ADMIN_NOT_FOUND' };
+                throw { code: 'WORKER_NOT_FOUND' };
             }
             return rows[0];
         } catch (error) {
@@ -80,9 +80,9 @@ const Admin = {
 
     findByCredentials: async (username, plainPassword) => {
         const sql = `
-            SELECT a.id as adminId, a.username, a.password,
+            SELECT a.id as workerId, a.username, a.password,
                 d.id as departmentId, d.name as departmentName
-            FROM admin a
+            FROM worker a
             INNER JOIN department d ON a.department = d.id
             WHERE a.username = ?
         `;
@@ -90,14 +90,14 @@ const Admin = {
             const [rows] = await db.query(sql, [username]);
             if (rows.length === 0) return null;
 
-            const admin = rows[0];
-            const isMatch = await bcrypt.compare(plainPassword, admin.password);
+            const worker = rows[0];
+            const isMatch = await bcrypt.compare(plainPassword, worker.password);
             if (!isMatch) return null;
 
             return {
-                id: admin.adminId,
-                departmentId: admin.departmentId,
-                departmentName: admin.departmentName,
+                id: worker.workerId,
+                departmentId: worker.departmentId,
+                departmentName: worker.departmentName,
             };
         } catch (error) {
             throw error;

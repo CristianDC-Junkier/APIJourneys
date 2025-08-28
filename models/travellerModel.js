@@ -13,6 +13,15 @@ const Traveller = {
                 id: result.insertId || result.lastID || result.id,
             };
         } catch (error) {
+            if (error.code === 'ER_DUP_ENTRY') {
+                const [existingRows] = await db.query(`SELECT trip FROM traveller WHERE dni = ?`, [dni]);
+                const existingTrip = existingRows.length ? existingRows[0].trip : null;
+
+                const customError = new Error(`Duplicate entry detected for DNI: ${dni}`);
+                customError.code = error.code;
+                customError.trip = existingTrip; 
+                throw customError;
+            }
             throw error;
         }
     },

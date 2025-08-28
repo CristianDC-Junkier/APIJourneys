@@ -27,6 +27,7 @@ function getSafeError(error) {
         message: mapped?.message || error.message || 'Error desconocido',
         code,
         status: mapped?.status || 500,
+        trip: error.trip || null,
     };
 }
 
@@ -37,7 +38,7 @@ exports.create = async (req, res) => {
         res.json(newTraveller);
     } catch (error) {
         const safeError = getSafeError(error);
-        res.status(safeError.status).json({ error: safeError.message });
+        res.status(safeError.status).json({ error: safeError.message, trip: safeError.trip });
     }
 };
 

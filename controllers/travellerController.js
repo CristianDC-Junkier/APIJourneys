@@ -14,6 +14,10 @@ function getSafeError(error) {
             message: 'El viajero ya fue modificado.',
             status: 409,
         },
+        TRAVEL_CONFLICT: {
+            message: 'El viaje ya no tiene asientos disponibles.',
+            status: 409,
+        },
         EMPTY_TABLE: {
             message: 'Lista de viajeros vacia.',
             status: 204,

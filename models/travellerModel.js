@@ -2,37 +2,52 @@
 
 const Traveller = {
     create: async (traveller) => {
-        const sql = `INSERT INTO traveller (dni, name, signup, department, trip) VALUES (?, ?, ?, ?, ?)`;
-        const { dni, name, signup, department, trip } = traveller;
+        const sql = `INSERT INTO traveller (dni, name, signup, phone, department, trip) VALUES (?, ?, ?, ?, ?, ?)`;
+        const { dni, name, signup, phone, department, trip } = traveller;
 
         try {
-            const [result] = await db.query(sql, [dni, name, signup, department, trip]);
+            const [result] = await db.query(sql, [dni, name, signup, phone, department, trip]);
 
             return {
                 ...traveller,
                 id: result.insertId || result.lastID || result.id,
             };
         } catch (error) {
-            if (error.code === 'ER_DUP_ENTRY') {
-                const [existingRows] = await db.query(`SELECT trip FROM traveller WHERE dni = ?`, [dni]);
-                const existingTrip = existingRows.length ? existingRows[0].trip : null;
 
-                const customError = new Error(`Duplicate entry detected for DNI: ${dni}`);
+            if (
+                (error.sqlState === '45000') ||      
+                (error.code === 'SQLITE_ABORT')      
+            ) {
+                throw { code: 'TRAVEL_CONFLICT' };
+            }
+
+            if (error.code === 'ER_DUP_ENTRY') {
+                const [existingRows] = await db.query(
+                    `SELECT t.descriptor AS tripDescriptor
+                   FROM traveller v
+                   JOIN travel t ON v.trip = t.id
+                   WHERE v.dni = ?`,
+                    [dni]
+                );
+                const existingTrip = existingRows.length ? existingRows[0].tripDescriptor : null;
+
+                const customError = new Error(`No se pudo insertar el viajero con dni ${dni}, ninguna fila afectada`);
                 customError.code = error.code;
-                customError.trip = existingTrip; 
+                customError.trip = existingTrip;
                 throw customError;
             }
+
             throw error;
         }
     },
 
     modify: async (traveller) => {
-        const sql = `UPDATE traveller SET dni = ?, name = ?, signup = ?, department = ?, trip = ?, version = (version + 1) % 10000 WHERE id = ? AND version = ?`;
+        const sql = `UPDATE traveller SET dni = ?, name = ?, signup = ?, phone = ?, department = ?, trip = ?, version = (version + 1) % 10000 WHERE id = ? AND version = ?`;
 
-        const { id, dni, name, signup, department, trip, version } = traveller;
+        const { id, dni, name, signup, department, phone, trip, version } = traveller;
 
         try {
-            const [result] = await db.query(sql, [dni, name, signup, department, trip, id, version]);
+            const [result] = await db.query(sql, [dni, name, signup, phone, department, trip, id, version]);
 
             if (result.affectedRows === 0) {
                 const [rows] = await db.query(`SELECT version FROM traveller WHERE id = ?`, [id]);
@@ -46,6 +61,12 @@ const Traveller = {
 
             return { ...traveller, version: (version + 1) % 10000 };
         } catch (error) {
+            if (
+                (error.sqlState === '45000') ||
+                (error.code === 'SQLITE_ABORT')
+            ) {
+                throw { code: 'TRAVEL_CONFLICT' };
+            }
             throw error;
         }
     },

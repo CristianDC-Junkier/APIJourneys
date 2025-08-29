@@ -10,6 +10,10 @@ function getSafeError(error) {
             message: 'Viaje no encontrado.',
             status: 404,
         },
+        SEATS_CONFLICT: {
+            message: 'El máximo de asientos no puede ser menor al de asientos ocupados ni a 30.',
+            status: 409,
+        },
         EMPTY_TABLE: {
             message: 'Lista de viajeros vacia.',
             status: 204,

@@ -17,6 +17,12 @@ const Travel = {
                 id: result.insertId || result.lastID || result.id,
             };
         } catch (error) {
+            if (
+                (error.sqlState === '45000') || 
+                (error.code === 'SQLITE_ABORT')     
+            ) {
+                throw { code: 'SEATS_CONFLICT' };
+            }
             throw error;
         }
     },
@@ -34,6 +40,12 @@ const Travel = {
 
             return { ...travel };
         } catch (error) {
+            if (
+                (error.sqlState === '45000') ||
+                (error.code === 'SQLITE_ABORT')
+            ) {
+                throw { code: 'SEATS_CONFLICT' };
+            }
             throw error;
         }
     },

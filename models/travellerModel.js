@@ -1,11 +1,18 @@
 ﻿const db = require('../config/db');
+const { encrypt, decrypt } = require('../util/cypherUtil'); 
 
 const Traveller = {
     create: async (traveller) => {
         const sql = `INSERT INTO traveller (dni, name, signup, phone, department, trip) VALUES (?, ?, ?, ?, ?, ?)`;
-        const { dni, name, signup, phone, department, trip } = traveller;
+        var { dni, name, signup, phone, department, trip } = traveller;
 
         try {
+
+            dni = encrypt(dni);
+            name = encrypt(name);
+            signup = encrypt(signup);
+            phone = encrypt(phone);
+
             const [result] = await db.query(sql, [dni, name, signup, phone, department, trip]);
 
             return {
@@ -13,7 +20,6 @@ const Traveller = {
                 id: result.insertId || result.lastID || result.id,
             };
         } catch (error) {
-
             if (
                 (error.sqlState === '45000') ||      
                 (error.code === 'SQLITE_ABORT')      
@@ -44,9 +50,14 @@ const Traveller = {
     modify: async (traveller) => {
         const sql = `UPDATE traveller SET dni = ?, name = ?, signup = ?, phone = ?, department = ?, trip = ?, version = (version + 1) % 10000 WHERE id = ? AND version = ?`;
 
-        const { id, dni, name, signup, department, phone, trip, version } = traveller;
+        var { id, dni, name, signup, department, phone, trip, version } = traveller;
 
         try {
+            dni = encrypt(dni);
+            name = encrypt(name);
+            signup = encrypt(signup);
+            phone = encrypt(phone);
+
             const [result] = await db.query(sql, [dni, name, signup, phone, department, trip, id, version]);
 
             if (result.affectedRows === 0) {
@@ -92,7 +103,16 @@ const Traveller = {
 
         try {
             const [rows] = await db.query(sql);
-            return rows;
+
+            const travellers = rows.map(t => ({
+                ...t,
+                dni: decrypt(t.dni),
+                name: decrypt(t.name),
+                signup: decrypt(t.signup),
+                phone: decrypt(t.phone)
+            }));
+
+            return travellers;
         } catch (error) {
             throw error;
         }
@@ -103,7 +123,16 @@ const Traveller = {
 
         try {
             const [rows] = await db.query(sql, [department]);
-            return rows;
+
+            const travellers = rows.map(t => ({
+                ...t,
+                dni: decrypt(t.dni),
+                name: decrypt(t.name),
+                signup: decrypt(t.signup),
+                phone: decrypt(t.phone)
+            }));
+
+            return travellers;
         } catch (error) {
             throw error;
         }
@@ -119,7 +148,13 @@ const Traveller = {
                 throw { code: 'TRAVELLER_NOT_FOUND' };
             }
 
-            return rows[0];
+            const traveller = rows[0];
+            traveller.dni = decrypt(traveller.dni);
+            traveller.name = decrypt(traveller.name);
+            traveller.signup = decrypt(traveller.signup);
+            traveller.phone = decrypt(traveller.phone);
+
+            return traveller;
         } catch (error) {
             throw error;
         }

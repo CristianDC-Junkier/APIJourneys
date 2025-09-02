@@ -59,7 +59,10 @@ const Admin = {
         const sql = `SELECT * FROM worker ORDER BY id`;
         try {
             const [rows] = await db.query(sql);
-            return rows;
+
+            const users = rows
+
+            return users;
         } catch (error) {
             throw error;
         }
@@ -72,7 +75,10 @@ const Admin = {
             if (rows.length === 0) {
                 throw { code: 'WORKER_NOT_FOUND' };
             }
-            return rows[0];
+
+            const user = rows[0];
+
+            return user;
         } catch (error) {
             throw error;
         }

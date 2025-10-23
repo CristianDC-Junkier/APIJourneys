@@ -1,5 +1,5 @@
 ﻿const db = require('../config/db');
-const { encrypt, decrypt } = require('../util/cypherUtil'); 
+const { encrypt, decrypt } = require('../util/cypherUtil');
 
 const Traveller = {
     create: async (traveller) => {
@@ -7,6 +7,15 @@ const Traveller = {
         var { dni, name, signup, phone, department, trip } = traveller;
 
         try {
+
+            const [rowDnis] = await db.query('SELECT dni FROM traveller');
+            for (let i = 0; i < rowDnis.length; i++) {
+                if (dni === decrypt(rowDnis[i].dni)) {
+                    throw {
+                        code: 'ER_DUP_ENTRY'
+                    }
+                }
+            }
 
             dni = encrypt(dni);
             name = encrypt(name);
@@ -21,8 +30,8 @@ const Traveller = {
             };
         } catch (error) {
             if (
-                (error.sqlState === '45000') ||      
-                (error.code === 'SQLITE_ABORT')      
+                (error.sqlState === '45000') ||
+                (error.code === 'SQLITE_ABORT')
             ) {
                 throw { code: 'TRAVEL_CONFLICT' };
             }
@@ -53,6 +62,16 @@ const Traveller = {
         var { id, dni, name, signup, department, phone, trip, version } = traveller;
 
         try {
+
+            const [rowDnis] = await db.query('SELECT dni FROM traveller');
+            for (let i = 0; i < rowDnis.length; i++) {
+                if (dni === decrypt(rowDnis[i].dni)) {
+                    throw {
+                        code: 'ER_DUP_ENTRY'
+                    }
+                }
+            }
+
             dni = encrypt(dni);
             name = encrypt(name);
             signup = encrypt(signup);
@@ -64,9 +83,9 @@ const Traveller = {
                 const [rows] = await db.query(`SELECT version FROM traveller WHERE id = ?`, [id]);
 
                 if (rows.length === 0) {
-                    throw { code: 'TRAVELLER_NOT_FOUND'};
+                    throw { code: 'TRAVELLER_NOT_FOUND' };
                 } else {
-                    throw { code: 'TRAVELLER_CONFLICT'};
+                    throw { code: 'TRAVELLER_CONFLICT' };
                 }
             }
 

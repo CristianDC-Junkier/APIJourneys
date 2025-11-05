@@ -62,13 +62,14 @@ const Traveller = {
         var { id, dni, name, signup, department, phone, trip, version } = traveller;
 
         try {
+            const [rowDnis] = await db.query(
+                'SELECT dni FROM traveller WHERE id != ?',
+                [id]
+            );
 
-            const [rowDnis] = await db.query('SELECT dni FROM traveller');
             for (let i = 0; i < rowDnis.length; i++) {
                 if (dni === decrypt(rowDnis[i].dni)) {
-                    throw {
-                        code: 'ER_DUP_ENTRY'
-                    }
+                    throw { code: 'ER_DUP_ENTRY' };
                 }
             }
 
